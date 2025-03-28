@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: <namespace>
+data:
+  nginx.conf: |
+    server {
+      listen 8081;
+      server_name localhost;
+      
+      location / {
+        return 200 "NGINX is running";
+        add_header Content-Type text/plain;
+      }
+      
+      location /nginx_status {
+        stub_status on;
+        allow 127.0.0.1; # Only allow requests from localhost (exporter)
+        deny all;        # Deny requests from other clients
+      }
+    }

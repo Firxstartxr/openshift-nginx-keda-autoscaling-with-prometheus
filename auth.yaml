@@ -1,0 +1,12 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: <trigger-auth-name>
+spec:
+  secretTargetRef: 
+  - parameter: bearerToken 
+    name: <token-name>
+    key: token 
+  - parameter: ca
+    name: <token-name>
+    key: ca.crt

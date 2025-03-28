@@ -1,0 +1,34 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: nginx-http-scaler
+  namespace: <namespace>
+spec:
+  scaleTargetRef:
+    name: nginx
+  minReplicaCount: 1
+  maxReplicaCount: 5
+  pollingInterval: 1
+  cooldownPeriod: 10
+  advanced:
+    restoreToOriginalReplicaCount: true
+    horizontalPodAutoscalerConfig:
+      name: keda-hpa-nginx-http-scaler
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 10
+          policies:
+          - type: Percent
+            value: 100
+            periodSeconds: 10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: <thanos-querier-server>
+      metricName: http_requests_per_second
+      threshold: '0.5'
+      query: sum(rate(nginx_http_requests_total{namespace="<namespace>"}[10s]))
+      authModes: bearer
+      namespace: <namespace>
+    authenticationRef:
+      name: <trigger-auth-name>
